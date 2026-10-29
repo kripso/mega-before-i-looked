@@ -10,21 +10,26 @@ in a shell this agent can run.
 
 ## Steps
 
-1. Read `plan.md`, `AGENTS.md` and `docs/adr/`.
-2. Draft the split as a table: title · plan section · scope · done when · blocked by.
-   One issue per unit of work.
+1. Read `plan.md`, the [issue contract](../../../AGENTS.md#issue-contract), and `docs/adr/`.
+   The contract is the single source for issue fields, plan labels, ownership and completion gates.
+2. Draft one issue per unit of work. Show a table with title, source section, scope/owned files,
+   done when, start after and finish after. Separate work that can start against a type contract
+   from work that must wait for its implementation before it can finish. Include a review-confirmation
+   issue or finish gate when another person must inspect a preview; cleanup waits for that signal.
 3. **Stop and show the table to the human.** Publish nothing until they approve it.
-4. Ask the human what every issue here must carry (fields, labels, wording), unless it is
-   already written down in this session or in the repo.
-5. Create each issue in dependency order, so blocked-by can cite real numbers:
+4. Reuse the contract's settled field choices. Ask only about material exceptions or unclear
+   outcomes, not the same issue-format question again. Draft bodies must follow the contract too.
+5. After approval, create issues in dependency order with the plan label, so dependencies can
+   cite real numbers. Never turn a draft reference into an invented GitHub issue number.
 
    ```sh
-   gh issue create --title "<title>" --body-file <tmp.md>
+   gh issue create --title "<title>" --body-file <tmp.md> --label "plan:<plan>"
    ```
 
 6. Record every issue URL from gh's output (not from memory) and reply with the list.
 
-Closing one, with the closing comment from AGENTS.md:
+Use `refs #n` rather than an automatic closing commit while a gate is pending.
+Close only after both its checks and finish gates hold, with the closing comment from AGENTS.md:
 
 ```sh
 gh issue close <n> -c "<closing comment>"
@@ -39,4 +44,6 @@ the same issues, made that way. GitHub issues out of reach altogether: write the
 ## Don'ts
 
 - Don't paste the whole plan into one issue, and don't keep issues only in chat.
-- Don't invent sections the plan doesn't have. If the plan is unclear, ask.
+- Don't invent sections the plan doesn't have. A derived review/wait unit cites the existing
+  review section. If the outcome or review signal is unclear, ask.
+- Don't close a review issue merely because the preview was uploaded or its link was sent.
