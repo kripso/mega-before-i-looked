@@ -1,8 +1,9 @@
 ---
 plan: morning-digest
-status: ready
+status: done
 owner: rook
 opened: 2026-10-29
+closed: 2026-10-29
 ---
 
 # Morning digest
@@ -77,3 +78,23 @@ page again with `LANE_MARKER` unset (the banner reads "no marker set") and uploa
 link. Move this plan to `docs/plans/done/` with its issue list.
 
 Done when: the preview link no longer shows the lane marker.
+
+## Issues
+
+| # | Issue | Section | Blocked by | Worker |
+|---|-------|---------|------------|--------|
+| [#1](https://github.com/kripso/mega-before-i-looked/issues/1) | Run-log reader and shared digest types | 1 | — | pi · gpt-6.1-sol · max |
+| [#2](https://github.com/kripso/mega-before-i-looked/issues/2) | Digest page: GET /digest/:night | 2a | #1 types | pi · gpt-6-luna · max |
+| [#3](https://github.com/kripso/mega-before-i-looked/issues/3) | Digest JSON: GET /api/digest/:night | 2b | #1 types | pi · gpt-6-luna · max |
+| [#4](https://github.com/kripso/mega-before-i-looked/issues/4) | Status board: digest links and per-night counts | 2c | #1 types; #2 for rendered links | pi · gpt-6-luna · max |
+| [#5](https://github.com/kripso/mega-before-i-looked/issues/5) | Digest route tests for HTML and JSON | 2d | #1 types; #2 and #3 for final verification | pi · gpt-6-luna · max |
+| [#6](https://github.com/kripso/mega-before-i-looked/issues/6) | Public HTML preview for the reviewer | 3 | #1–#5; publishing approval | pi · gpt-6-luna · max |
+| [#7](https://github.com/kripso/mega-before-i-looked/issues/7) | After review: remove the public marker and archive the plan | 4 | #6; review confirmation and replacement approval | pi · gpt-6.1-sol · max |
+
+## Execution notes
+
+- The shared types were committed before the reader implementation.
+- Section 2 used separate issue branches in sequence because the orchestration tool could not prepare worktrees for this nested repo.
+- The coordinator integrated the routes and published the review artifact through a manual GitHub Pages workflow; neither the HTML nor the lane marker was committed.
+- Issue #6 was reopened after an early closure, then closed after the reviewer confirmed seeing the preview. Marker removal followed a separate human approval and was verified at the same public URL.
+- The marker-free preview is https://kripso.github.io/mega-before-i-looked/.
