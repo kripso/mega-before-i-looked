@@ -1,10 +1,11 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { RigConfig } from '../src/config.js';
 import { createApp } from '../src/app.js';
 import { readStatus } from '../src/status.js';
+import * as heartbeat from '../src/heartbeat.js';
 
 function configFor(runsDir: string): RigConfig {
   return {
@@ -29,6 +30,7 @@ describe('status board', () => {
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     rmSync(runsDir, { recursive: true, force: true });
     if (previousLaneMarker === undefined) delete process.env.LANE_MARKER;
     else process.env.LANE_MARKER = previousLaneMarker;
@@ -96,6 +98,7 @@ describe('status board', () => {
   });
 
   it('preserves status fields, the lane banner, no-beat warning, and health response', async () => {
+    vi.spyOn(heartbeat, 'lastBeat').mockReturnValue(null);
     process.env.LANE_MARKER = 'TEST-MARKER';
     const app = createApp(configFor(runsDir));
 
