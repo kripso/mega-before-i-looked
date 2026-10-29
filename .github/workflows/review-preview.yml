@@ -38,7 +38,9 @@ jobs:
           PREVIEW_HOST: 127.0.0.1
           LANE_ID: lane-07
           LANE_MARKER: ${{ inputs.lane_marker }}
-        run: pnpm exec tsx scripts/export-preview.ts "$RUNNER_TEMP/review-preview/index.html"
+        run: |
+          if [ -z "$LANE_MARKER" ]; then unset LANE_MARKER; fi
+          pnpm exec tsx scripts/export-preview.ts "$RUNNER_TEMP/review-preview/index.html"
       - uses: actions/upload-pages-artifact@v4
         with:
           path: ${{ runner.temp }}/review-preview
