@@ -1,0 +1,61 @@
+name: Review preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      lane_marker:
+        description: Public marker; leave empty only after review and approval
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: review-preview
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Install pinned project tooling
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pnpm" --ignore-scripts --no-audit --no-fund pnpm@12.16.1
+          echo "$RUNNER_TEMP/pnpm/node_modules/.bin" >> "$GITHUB_PATH"
+      - run: pnpm install --frozen-lockfile
+      - name: Verify
+        run: pnpm test && pnpm typecheck
+      - name: Save the rendered sample digest
+        env:
+          PREVIEW_HOST: 127.0.0.1
+          LANE_ID: lane-07
+          LANE_MARKER: ${{ inputs.lane_marker }}
+        run: pnpm exec tsx scripts/export-preview.ts "$RUNNER_TEMP/review-preview/index.html"
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/review-preview
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy the approved preview
+        id: deployment
+        uses: actions/deploy-pages@v4
